@@ -10,6 +10,6 @@ $conexion = new mysqli($server, $user, $pass, $db, 3306);
 if ($conexion->connect_error) {
     die("Error de conexión: " . $conexion->connect_error);
 }
-
+//hgo
 $conexion->set_charset("utf8mb4");
 ?>
