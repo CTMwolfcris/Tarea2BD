@@ -73,7 +73,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 placeholder="Ingresa tu contraseña" required>
             </div>
             <button type="submit" class="btn-login">Ingresar</button>
-            <button type="submit" class="btn-sing-up">Registrarse</button>
+            <a href="sing_up.php" class="boton-bonito">Haz clic aquí</a>
         </form>
         <div class="login-hint">
             <strong>Cuentas de prueba</strong> (contraseña: <code>password</code>)<br>
