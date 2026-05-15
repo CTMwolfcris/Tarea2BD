@@ -12,16 +12,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if (empty($rut) || empty($clave)) {
         $error = "Debes completar ambos campos.";
     } else {
-        $stmt = $conexion->prepare(
-            "SELECT U_Id, U_Rut, U_Nombre, U_Email, U_Password, U_Rol
-            FROM usuarios
-            WHERE U_Rut = ? AND U_Activo = 1"
-        );
+        $stmt = $conexion->prepare("SELECT U_Id, U_Rut, U_Nombre, U_Email, U_Password, U_RolFROM usuariosWHERE U_Rut = ? AND U_Activo = 1");
         $stmt->bind_param("s", $rut);
         $stmt->execute();
         $result = $stmt->get_result();
         if ($result && $result->num_rows > 0) {
             $usuario = $result->fetch_assoc();
+             // Verificar contraseña encriptada
             if (password_verify($clave, $usuario['U_Password'])) {
                 $_SESSION['usuario'] = [
                     'id'     => $usuario['U_Id'],
@@ -60,7 +57,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             <h1>Sistema de Postulaciones</h1>
             <p>Centro Tecnológico USM</p>
         </div>
-
         <?php if ($error): ?>
             <div class="alerta alerta-error"><?= htmlspecialchars($error) ?></div>
         <?php endif; ?>
@@ -77,6 +73,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 placeholder="Ingresa tu contraseña" required>
             </div>
             <button type="submit" class="btn-login">Ingresar</button>
+            <button type="submit" class="btn-sing-up">Registrarse</button>
         </form>
         <div class="login-hint">
             <strong>Cuentas de prueba</strong> (contraseña: <code>password</code>)<br>
