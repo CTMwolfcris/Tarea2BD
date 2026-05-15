@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 14-05-2026 a las 04:53:55
+-- Tiempo de generación: 15-05-2026 a las 04:46:47
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -25,34 +25,26 @@ DELIMITER $$
 --
 -- Procedimientos
 --
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_registrar_evaluacion` (IN `p_postulacion_id` INT, IN `p_evaluador_rut` VARCHAR(12), IN `p_comentario` TEXT, IN `p_nuevo_estado` INT)   BEGIN
-  DECLARE EXIT HANDLER FOR SQLEXCEPTION
-  BEGIN
-    ROLLBACK;
-    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error al registrar evaluacion';
-  END;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_registrar_evaluacion` (IN `p_id` INT, IN `p_rut` VARCHAR(12), IN `p_comen` TEXT, IN `p_estado` INT)   BEGIN
+    -- Insertamos el registro en la tabla de evaluaciones [cite: 871]
+    INSERT INTO evaluacion (EV_Postulacion_ID, EV_Evaluador_Rut, EV_Comentario, EV_Estado_Nuevo, EV_Fecha)
+    VALUES (p_id, p_rut, p_comen, p_estado, NOW());
 
-  START TRANSACTION;
-    -- Registrar la evaluacion
-    INSERT INTO evaluacion (EV_Postulacion_ID, EV_Evaluador_Rut, EV_Comentario, EV_Estado_Nuevo)
-    VALUES (p_postulacion_id, p_evaluador_rut, p_comentario, p_nuevo_estado);
-
-    -- Actualizar estado de la postulacion
+    -- Actualizamos el estado actual de la postulación [cite: 801]
     UPDATE postulacion
-    SET P_Estado_ID = p_nuevo_estado
-    WHERE P_Id = p_postulacion_id;
-  COMMIT;
+    SET P_Estado_ID = p_estado
+    WHERE P_Id = p_id;
 END$$
 
 --
 -- Funciones
 --
 CREATE DEFINER=`root`@`localhost` FUNCTION `fn_total_semanas` (`p_id` INT) RETURNS INT(11) DETERMINISTIC BEGIN
-  DECLARE total INT;
-  SELECT COALESCE(SUM(ET_Semanas), 0) INTO total
-  FROM etapa
-  WHERE ET_Postulacion_ID = p_id;
-  RETURN total;
+    DECLARE total INT;
+    SELECT COALESCE(SUM(ET_Semanas), 0) INTO total
+    FROM etapa
+    WHERE ET_Postulacion_ID = p_id;
+    RETURN total;
 END$$
 
 DELIMITER ;
@@ -461,10 +453,10 @@ INSERT INTO `postulacion` (`P_Id`, `P_Codigo_interno`, `P_Nombre`, `P_Presupuest
 --
 DELIMITER $$
 CREATE TRIGGER `trg_fecha_envio` BEFORE UPDATE ON `postulacion` FOR EACH ROW BEGIN
-  -- Si cambia a estado "Enviada" (EP_Id=2) y aun no tiene fecha de envio
-  IF NEW.P_Estado_ID = 2 AND OLD.P_Estado_ID = 1 AND OLD.P_Fecha_Envio IS NULL THEN
-    SET NEW.P_Fecha_Envio = NOW();
-  END IF;
+    -- Si el estado cambia de Borrador (1) a Enviada (2) [cite: 869]
+    IF NEW.P_Estado_ID = 2 AND OLD.P_Estado_ID = 1 AND OLD.P_Fecha_Envio IS NULL THEN
+        SET NEW.P_Fecha_Envio = NOW();
+    END IF;
 END
 $$
 DELIMITER ;
@@ -629,7 +621,7 @@ CREATE TABLE `vista_postulaciones` (
 --
 DROP TABLE IF EXISTS `vista_postulaciones`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vista_postulaciones`  AS SELECT `p`.`P_Id` AS `P_Id`, `p`.`P_Codigo_interno` AS `P_Codigo_interno`, `p`.`P_Nombre` AS `P_Nombre`, `p`.`P_Presupuesto` AS `P_Presupuesto`, `p`.`P_Fecha` AS `P_Fecha`, `p`.`P_Fecha_Envio` AS `P_Fecha_Envio`, `ep`.`EP_Nombre` AS `Estado`, `p`.`P_Estado_ID` AS `P_Estado_ID`, `ti`.`TI_Tipo` AS `TipoIniciativa`, `c`.`C_Nombre` AS `Campus`, `r1`.`R_Nombre` AS `RegionRealizar`, `r2`.`R_Nombre` AS `RegionImpacto`, `e`.`E_Nombre` AS `Empresa`, `e`.`E_Rut` AS `EmpresaRut`, `te`.`T_Tamaño` AS `TamanoEmpresa`, `e`.`E_ConvenioUSM` AS `ConvenioUSM`, concat(`i1`.`I_Nombre`) AS `Responsable1`, `p`.`P_Responsable1_Rut` AS `P_Responsable1_Rut`, concat(`i2`.`I_Nombre`) AS `Responsable2`, `p`.`P_Responsable2_Rut` AS `P_Responsable2_Rut` FROM (((((((((`postulacion` `p` join `estadopostulacion` `ep` on(`p`.`P_Estado_ID` = `ep`.`EP_Id`)) join `tipoiniciativa` `ti` on(`p`.`P_Iniciativa_ID` = `ti`.`TI_Id`)) join `campus` `c` on(`p`.`P_ID_Campus` = `c`.`C_Id`)) join `region` `r1` on(`p`.`P_Region_Realizar` = `r1`.`R_ID`)) join `region` `r2` on(`p`.`P_Region_Impacto` = `r2`.`R_ID`)) join `empresaexterna` `e` on(`p`.`P_Empresa_Rut` = `e`.`E_Rut`)) join `tamañoempresa` `te` on(`e`.`E_Tamaño` = `te`.`T_Id`)) join `integrantes` `i1` on(`p`.`P_Responsable1_Rut` = `i1`.`I_Rut`)) join `integrantes` `i2` on(`p`.`P_Responsable2_Rut` = `i2`.`I_Rut`)) ;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vista_postulaciones`  AS SELECT `p`.`P_Id` AS `P_Id`, `p`.`P_Codigo_interno` AS `P_Codigo_interno`, `p`.`P_Nombre` AS `P_Nombre`, `p`.`P_Presupuesto` AS `P_Presupuesto`, `p`.`P_Fecha` AS `P_Fecha`, `p`.`P_Fecha_Envio` AS `P_Fecha_Envio`, `ep`.`EP_Nombre` AS `Estado`, `p`.`P_Estado_ID` AS `P_Estado_ID`, `ti`.`TI_Tipo` AS `TipoIniciativa`, `c`.`C_Nombre` AS `Campus`, `r1`.`R_Nombre` AS `RegionRealizar`, `r2`.`R_Nombre` AS `RegionImpacto`, `e`.`E_Nombre` AS `Empresa`, `e`.`E_Rut` AS `EmpresaRut`, `te`.`T_Tamaño` AS `TamanoEmpresa`, `e`.`E_ConvenioUSM` AS `ConvenioUSM`, `i1`.`I_Nombre` AS `Responsable1`, `p`.`P_Responsable1_Rut` AS `P_Responsable1_Rut`, `i2`.`I_Nombre` AS `Responsable2`, `p`.`P_Responsable2_Rut` AS `P_Responsable2_Rut` FROM (((((((((`postulacion` `p` join `estadopostulacion` `ep` on(`p`.`P_Estado_ID` = `ep`.`EP_Id`)) join `tipoiniciativa` `ti` on(`p`.`P_Iniciativa_ID` = `ti`.`TI_Id`)) join `campus` `c` on(`p`.`P_ID_Campus` = `c`.`C_Id`)) join `region` `r1` on(`p`.`P_Region_Realizar` = `r1`.`R_ID`)) join `region` `r2` on(`p`.`P_Region_Impacto` = `r2`.`R_ID`)) join `empresaexterna` `e` on(`p`.`P_Empresa_Rut` = `e`.`E_Rut`)) join `tamañoempresa` `te` on(`e`.`E_Tamaño` = `te`.`T_Id`)) join `integrantes` `i1` on(`p`.`P_Responsable1_Rut` = `i1`.`I_Rut`)) join `integrantes` `i2` on(`p`.`P_Responsable2_Rut` = `i2`.`I_Rut`)) ;
 
 --
 -- Índices para tablas volcadas
