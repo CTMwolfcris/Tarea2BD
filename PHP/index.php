@@ -5,10 +5,8 @@
 require_once "guard.php";
 include "conexion.php";
 $__titulo = "Inicio";
-
 // Búsqueda rápida desde barra
 $busqueda = trim($_GET['q'] ?? '');
-
 // Listado de postulaciones "gestionadas" (estado != borrador)
 // Postulante: solo ve sus postulaciones (no borrador de otros)
 // Coordinador/Admin: ve todas las enviadas/evaluadas
@@ -58,7 +56,6 @@ if ($__rol === 'postulante') {
 } else {
     $stmt_rev = $conexion->prepare("SELECT COUNT(*) as total FROM postulacion WHERE P_Estado_ID = 3");
 }
-
 $stmt_rev->execute();
 $res_rev = $stmt_rev->get_result();
 $conteo_revision = $res_rev->fetch_assoc()['total'] ?? 0;
@@ -74,7 +71,6 @@ if ($__rol === 'postulante') {
 } else {
     $stmt_rech = $conexion->prepare("SELECT COUNT(*) as total FROM postulacion WHERE P_Estado_ID = 5");
 }
-
 $stmt_rech->execute();
 $res_rech = $stmt_rech->get_result();
 $conteo_rechazadas = $res_rech->fetch_assoc()['total'] ?? 0;
@@ -82,13 +78,9 @@ $stmt_aprob->execute();
 $res_aprob = $stmt_aprob->get_result();
 $conteo_aprobadas = $res_aprob->fetch_assoc()['total'] ?? 0;
 // --- FIN DEL BLOQUE NUEVO ---
-
 include "navbar.php";
 ?>
-
-
 <h2 class="titulo-seccion">Postulaciones Gestionadas</h2>
-
 <div class="dashboard-stats">
     <div class="stat-block">
         <span class="stat-label">Total Gestionadas</span>
@@ -107,7 +99,6 @@ include "navbar.php";
         <span class="stat-value" style="color: var(--rojo);"><?= $conteo_rechazadas ?></span>
     </div>
 </div>
-
 <form method="GET" action="index.php" class="barra-busqueda">
     <input type="text" name="q" value="<?= htmlspecialchars($busqueda) ?>" placeholder="Buscar...">
     <button type="submit" class="btn btn-primary">Buscar</button>
@@ -122,12 +113,9 @@ include "navbar.php";
         <a href="index.php" class="btn btn-secundario">Limpiar</a>
     <?php endif; ?>
 </form>
-
-
 <?php if ($busqueda): ?>
     <p class="resultado-busqueda">Resultados para: <strong><?= htmlspecialchars($busqueda) ?></strong></p>
 <?php endif; ?>
-
 <?php if ($postulaciones->num_rows > 0): ?>
 <div class="tabla-wrapper">
     <table class="tabla">
@@ -154,7 +142,7 @@ include "navbar.php";
                 <td>$<?= number_format($row['P_Presupuesto'], 0, ',', '.') ?></td>
                 <td><span class="badge badge-<?= strtolower(str_replace(' ', '-', $row['Estado'])) ?>"><?= htmlspecialchars($row['Estado']) ?></span></td>
                 <td>
-                    <a href="ver_postulacion.php?id=<?= $row['P_Id'] ?>" class="btn btn-sm btn-info">Ver</a>
+                    <a href="ver_postulacion.php?id=<?= $row['P_Id'] ?>" class="btn btn-outline-light btn-sm>Ver</a>
                     <?php if ($__rol === 'coordinador' && in_array($row['P_Estado_ID'], [2,3])): ?>
                         <a href="evaluar_postulacion.php?id=<?= $row['P_Id'] ?>" class="btn btn-sm btn-primary">Evaluar</a>
                     <?php endif; ?>
@@ -169,5 +157,4 @@ include "navbar.php";
         <?= $busqueda ? "No se encontraron resultados para \"" . htmlspecialchars($busqueda) . "\"." : "No hay postulaciones gestionadas aún." ?>
     </div>
 <?php endif; ?>
-
 <?php include "footer.php"; ?>

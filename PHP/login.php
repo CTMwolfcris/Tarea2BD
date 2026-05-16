@@ -5,26 +5,22 @@ if (isset($_SESSION['usuario'])) {
     header("Location: index.php");
     exit();
 }
-
 include("conexion.php");
 $error = "";
-
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $rut   = trim($_POST['rut']   ?? '');
     $clave = trim($_POST['clave'] ?? '');
-
     if (empty($rut) || empty($clave)) {
         $error = "Debes completar todos los campos.";
     } else {
-        // Sentencia preparada para evitar Inyección SQL (Bonus +5)
+        // Sentencia preparada para evitar Inyección SQL
         $stmt = $conexion->prepare("SELECT * FROM usuarios WHERE U_Rut = ? AND U_Activo = 1");
         $stmt->bind_param("s", $rut);
         $stmt->execute();
         $result = $stmt->get_result();
-
         if ($result && $result->num_rows > 0) {
             $usuario = $result->fetch_assoc();
-            // Verificación segura de contraseña
+            // verificamos que la clave ingresada coincida con el hash
             if (password_verify($clave, $usuario['U_Password'])) {
                 $_SESSION['usuario'] = [
                     'id'     => $usuario['U_Id'],
@@ -58,11 +54,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             <h1>Sistema de Postulaciones</h1>
             <p>Centro Tecnológico USM</p>
         </div>
-
         <?php if ($error): ?>
             <div class="alerta alerta-error"><?php echo htmlspecialchars($error); ?></div>
         <?php endif; ?>
-
         <form method="POST" class="login-form">
             <div class="campo">
                 <label>RUT</label>
@@ -74,7 +68,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             </div>
             <button type="submit" class="btn-login">Ingresar</button>
         </form>
-        
         <div class="login-footer">
             <p>¿No tienes cuenta? <a href="sing_up.php">Regístrate aquí</a></p>
         </div>

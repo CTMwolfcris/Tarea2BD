@@ -3,10 +3,8 @@ require_once "guard.php";
 requerirRol('postulante');
 include "conexion.php";
 $__titulo = "Crear Postulación";
-
 $error = "";
 $ok    = "";
-
 // Cargar datos para selects
 $regiones   = $conexion->query("SELECT R_ID, R_Nombre FROM region ORDER BY R_ID");
 $campus     = $conexion->query("SELECT C_Id, C_Nombre FROM campus ORDER BY C_Nombre");
@@ -32,17 +30,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $region_ej   = (int)($_POST['region_ej']  ?? 0);
     $region_imp  = (int)($_POST['region_imp'] ?? 0);
     $campus_id   = (int)($_POST['campus_id']  ?? 0);
-
     // Equipo (arrays)
     $eq_ruts  = $_POST['eq_rut']  ?? [];
     $eq_areas = $_POST['eq_area'] ?? [];
     $eq_roles = $_POST['eq_rol']  ?? [];
-
     // Etapas (arrays)
     $et_nombres     = $_POST['et_nombre']     ?? [];
     $et_semanas     = $_POST['et_semanas']    ?? [];
     $et_entregables = $_POST['et_entregable'] ?? [];
-
     if (!$codigo || !$nombre || !$presupuesto || !$descripcion || !$iniciativa
         || !$resp1 || !$resp2 || !$empresa_rut || !$region_ej || !$region_imp || !$campus_id) {
         $error = "Completa todos los campos obligatorios.";
@@ -56,7 +51,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         if ($chk->get_result()->num_rows > 0) {
             $error = "El código interno ya existe. Elige otro.";
         } else {
-            // Insertar postulación (estado 1 = Borrador)
+            // insertamos la postulacion como borrador
             $stmt = $conexion->prepare(
                 "INSERT INTO postulacion
                 (P_Codigo_interno, P_Nombre, P_Presupuesto, P_Fecha, P_Descripcion,
@@ -71,10 +66,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 $iniciativa, $resp1, $resp2,
                 $empresa_rut, $region_ej, $region_imp, $campus_id
             );
-
             if ($stmt->execute()) {
                 $new_id = $conexion->insert_id;
-
                 // Insertar equipo
                 foreach ($eq_ruts as $idx => $rut) {
                     $rut   = trim($rut);
@@ -89,7 +82,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                         $stmtEq->execute();
                     }
                 }
-
                 // Insertar etapas
                 foreach ($et_nombres as $idx => $nombre_et) {
                     $nombre_et   = trim($nombre_et);
@@ -104,7 +96,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                         $stmtEt->execute();
                     }
                 }
-
                 $_SESSION['flash_ok'] = "Postulación creada como borrador (ID: $new_id).";
                 header("Location: mis_postulaciones.php");
                 exit();
@@ -114,25 +105,19 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         }
     }
 }
-
-// Re-fetch para selects después de POST fallido
+// recargamos las listas pa que el formulario no quede vacio si hay error
 $regiones->data_seek(0);
 $campus->data_seek(0);
 $tipos->data_seek(0);
 $empresas->data_seek(0);
 $integrantes->data_seek(0);
-
 include "navbar.php";
 ?>
-
 <h2 class="titulo-seccion">Nueva Postulación</h2>
-
 <?php if ($error): ?>
     <div class="alerta alerta-error"><?= htmlspecialchars($error) ?></div>
 <?php endif; ?>
-
 <form method="POST" class="formulario-grande">
-
     <!-- ANTECEDENTES POSTULACIÓN -->
     <div class="card">
         <h3 class="card-titulo">Antecedentes de Postulación (*)</h3>
@@ -220,7 +205,6 @@ include "navbar.php";
             </div>
         </div>
     </div>
-
     <!-- ANTECEDENTES EMPRESA -->
     <div class="card">
         <h3 class="card-titulo">Antecedentes Entidad Externa (*)</h3>
@@ -236,7 +220,6 @@ include "navbar.php";
             </select>
         </div>
     </div>
-
     <!-- ANTECEDENTES INICIATIVA -->
     <div class="card">
         <h3 class="card-titulo">Antecedentes de la Iniciativa (*)</h3>
@@ -267,7 +250,6 @@ include "navbar.php";
                 value="<?= htmlspecialchars($_POST['presupuesto'] ?? '') ?>">
         </div>
     </div>
-
     <!-- EQUIPO DE TRABAJO -->
     <div class="card">
         <h3 class="card-titulo">Equipo de Trabajo (*)</h3>
@@ -296,7 +278,6 @@ include "navbar.php";
         </table>
         <button type="button" class="btn btn-sm btn-secundario" onclick="agregarIntegrante()">+ Agregar integrante</button>
     </div>
-
     <!-- CRONOGRAMA -->
     <div class="card">
         <h3 class="card-titulo">Cronograma (*)</h3>
@@ -315,15 +296,13 @@ include "navbar.php";
         </table>
         <button type="button" class="btn btn-sm btn-secundario" onclick="agregarEtapa()">+ Agregar etapa</button>
     </div>
-
     <div class="acciones-bottom">
         <a href="mis_postulaciones.php" class="btn btn-secundario">Cancelar</a>
         <button type="submit" class="btn btn-primary">Guardar Borrador</button>
     </div>
 </form>
-
 <script>
-// Plantilla HTML de una fila de integrante (se inyecta al agregar)
+// recargamos las listas pa que el formulario no quede vacio si hay error
 const opcionesIntegrantes = `<?php
 $int4 = $conexion->query("SELECT I_Rut, I_Nombre FROM integrantes ORDER BY I_Nombre");
 $opts = '<option value="">-- Selecciona --</option>';
@@ -333,7 +312,6 @@ while ($i = $int4->fetch_assoc()) {
 }
 echo addslashes($opts);
 ?>`;
-
 function agregarIntegrante() {
     const tbody = document.getElementById('filas-equipo');
     const tr = document.createElement('tr');
@@ -345,7 +323,6 @@ function agregarIntegrante() {
     `;
     tbody.appendChild(tr);
 }
-
 function agregarEtapa() {
     const tbody = document.getElementById('filas-etapas');
     const tr = document.createElement('tr');
@@ -357,10 +334,8 @@ function agregarEtapa() {
     `;
     tbody.appendChild(tr);
 }
-
 function quitarFila(btn) {
     btn.closest('tr').remove();
 }
 </script>
-
 <?php include "footer.php"; ?>

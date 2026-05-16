@@ -6,10 +6,8 @@ require_once "guard.php";
 requerirRol('administrador');
 include "conexion.php";
 $__titulo = "Gestionar Usuarios";
-
 $error = "";
 $ok    = "";
-
 // Crear usuario
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'crear') {
     $rut    = trim($_POST['rut']    ?? '');
@@ -17,7 +15,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'crear
     $email  = trim($_POST['email']  ?? '');
     $clave  = trim($_POST['clave']  ?? '');
     $rol    = trim($_POST['rol']    ?? '');
-
     if (!$rut || !$nombre || !$email || !$clave || !$rol) {
         $error = "Completa todos los campos.";
     } elseif (!in_array($rol, ['postulante','coordinador','administrador'])) {
@@ -36,7 +33,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'crear
         }
     }
 }
-
 // Activar/desactivar usuario
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'toggle') {
     $uid = (int)$_POST['uid'];
@@ -47,19 +43,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'toggl
     $_SESSION['flash_ok'] = $act ? "Usuario activado." : "Usuario desactivado.";
     header("Location: gestionar_usuarios.php"); exit();
 }
-
 // Listar usuarios
 $usuarios = $conexion->query("SELECT * FROM usuarios ORDER BY U_Rol, U_Nombre");
-
 include "navbar.php";
 ?>
-
 <h2 class="titulo-seccion">Gestionar Usuarios</h2>
-
 <?php if ($error): ?>
     <div class="alerta alerta-error"><?= htmlspecialchars($error) ?></div>
 <?php endif; ?>
-
 <!-- Crear usuario -->
 <div class="card">
     <h3 class="card-titulo">Crear Nuevo Usuario</h3>
@@ -97,7 +88,6 @@ include "navbar.php";
         </div>
     </form>
 </div>
-
 <!-- Listar usuarios -->
 <div class="card">
     <h3 class="card-titulo">Usuarios del Sistema</h3>
@@ -134,5 +124,4 @@ include "navbar.php";
         </table>
     </div>
 </div>
-
 <?php include "footer.php"; ?>

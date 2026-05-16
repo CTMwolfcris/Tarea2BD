@@ -3,18 +3,15 @@ require_once "guard.php";
 requerirRol('administrador');
 include "conexion.php";
 $__titulo = "Gestionar Asignaciones";
-
 // Asignar evaluador
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'asignar') {
     $postulacion_id  = (int)$_POST['postulacion_id'];
     $evaluador_rut   = trim($_POST['evaluador_rut']);
-
     if ($postulacion_id && $evaluador_rut) {
         // Desactivar asignación previa
         $des = $conexion->prepare("UPDATE asignacion_evaluador SET AE_Activo=0 WHERE AE_Postulacion_ID=?");
         $des->bind_param("i", $postulacion_id);
         $des->execute();
-
         // Crear nueva
         $ins = $conexion->prepare(
             "INSERT INTO asignacion_evaluador (AE_Postulacion_ID, AE_Evaluador_Rut) VALUES (?,?)"
@@ -27,7 +24,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'asign
             $upd = $conexion->prepare("UPDATE postulacion SET P_Estado_ID=3 WHERE P_Id=? AND P_Estado_ID=2");
             $upd->bind_param("i", $postulacion_id);
             $upd->execute();
-
             $_SESSION['flash_ok'] = "Evaluador asignado correctamente.";
         } else {
             $_SESSION['flash_error'] = "Error al asignar: " . $conexion->error;
@@ -35,7 +31,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'asign
     }
     header("Location: gestionar_asignaciones.php"); exit();
 }
-
 // Listar postulaciones enviadas sin asignación activa + las asignadas
 $postulaciones = $conexion->query(
     "SELECT vp.*, ae.AE_Evaluador_Rut, u.U_Nombre AS EvaluadorNombre
@@ -45,16 +40,12 @@ $postulaciones = $conexion->query(
     WHERE vp.P_Estado_ID IN (2,3,4,5)
     ORDER BY vp.P_Fecha DESC"
 );
-
 $evaluadores = $conexion->query(
     "SELECT U_Rut, U_Nombre FROM usuarios WHERE U_Rol='coordinador' AND U_Activo=1 ORDER BY U_Nombre"
 )->fetch_all(MYSQLI_ASSOC);
-
 include "navbar.php";
 ?>
-
 <h2 class="titulo-seccion">Gestionar Asignaciones de Evaluadores</h2>
-
 <div class="tabla-wrapper">
     <table class="tabla">
         <thead>
@@ -103,5 +94,4 @@ include "navbar.php";
         </tbody>
     </table>
 </div>
-
 <?php include "footer.php"; ?>

@@ -100,25 +100,20 @@ Todas las secciones tienen navegación por navbar. No se requiere recargar ni re
 
 ### VIEW — `vista_postulaciones`
 
-Une `postulacion` con todas sus tablas relacionadas (estado, campus, región, empresa, tamaño, tipo, responsables).
-Usada en el listado general, mis postulaciones, ver detalle y búsquedas.
+Vista que junta la tabla postulacion con empresa, campus, región y estado para no tener que hacer joins cada vez que necesitamos mostrar el listado.
 
 ### FUNCTION — `fn_total_semanas(p_id INT)`
 
-Calcula el total de semanas del cronograma de una postulación sumando todas las etapas.
-Usada en la vista de mis postulaciones (columna "Duración") y en ver detalle.
+Suma las semanas de todas las etapas de una postulación y devuelve el total.
+Se usa para mostrar la duración en mis postulaciones y en el detalle.
 
 ### STORED PROCEDURE — `sp_registrar_evaluacion`
 
-Recibe: `p_postulacion_id`, `p_evaluador_rut`, `p_comentario`, `p_nuevo_estado`.
-Dentro de una transacción: inserta registro en `evaluacion` y actualiza `P_Estado_ID` en `postulacion`.
-Usado en `evaluar_postulacion.php`.
+Guarda el comentario del evaluador y actualiza el estado de la postulación al mismo tiempo. Lo usamos en evaluar_postulacion.php.
 
 ### TRIGGER — `trg_fecha_envio`
 
-Se activa BEFORE UPDATE en `postulacion`.
-Cuando el estado cambia de 1 (Borrador) a 2 (Enviada) y `P_Fecha_Envio` es NULL, asigna `NOW()` automáticamente.
-Activado desde `enviar_postulacion.php`.
+Cuando el postulante envía una postulación, este trigger registra automáticamente la fecha y hora de envío sin que el usuario tenga que ingresarla.
 
 ---
 

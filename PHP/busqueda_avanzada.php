@@ -8,7 +8,6 @@ require_once "guard.php";
 #Conectamos con la base de datos
 include "conexion.php";
 $__titulo = "Búsqueda Avanzada";
-
 // Cargamos las opciones de filtro antes del inicion de la pagina 
 $regiones = $conexion->query("SELECT R_ID, R_Nombre FROM region ORDER BY R_ID")->fetch_all(MYSQLI_ASSOC);
 $campus = $conexion->query("SELECT C_Id, C_Nombre FROM campus ORDER BY C_Nombre")->fetch_all(MYSQLI_ASSOC);
@@ -19,7 +18,6 @@ $evaluadores = $conexion->query("SELECT U_Rut, U_Nombre FROM usuarios WHERE U_Ro
 // Variables para detectar si el usuario ya le dio a buscar o es la primera vez que entra a la pagina
 $resultados = null;
 $buscando = false;
-
 if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['buscar'])) {
     $buscando = true;
     // Construir query dinámicamente con prepared statement

@@ -43,7 +43,6 @@ if ($__rol === 'postulante') {
 }
 $stmt->execute();
 $resultados = $stmt->get_result();
-
 #Codigo Html
 ?>
 <p class="resultado-busqueda">Resultados para: <strong><?= htmlspecialchars($q) ?></strong></p>
@@ -70,7 +69,5 @@ $resultados = $stmt->get_result();
 <?php else: ?>
     <div class="vacio">Sin resultados para "<?= htmlspecialchars($q) ?>".</div>
 <?php endif; ?>
-
 <?php endif; ?>
-
 <?php include "footer.php"; ?>

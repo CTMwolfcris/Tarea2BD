@@ -3,7 +3,6 @@ require_once "guard.php";
 requerirRol('coordinador');
 include "conexion.php";
 $__titulo = "Mis Asignaciones";
-
 $stmt = $conexion->prepare(
     "SELECT vp.*, ae.AE_Fecha_Asignacion
     FROM vista_postulaciones vp
@@ -14,12 +13,9 @@ $stmt = $conexion->prepare(
 $stmt->bind_param("s", $__rut);
 $stmt->execute();
 $asignaciones = $stmt->get_result();
-
 include "navbar.php";
 ?>
-
 <h2 class="titulo-seccion">Mis Asignaciones</h2>
-
 <?php if ($asignaciones->num_rows > 0): ?>
 <div class="tabla-wrapper">
     <table class="tabla">
@@ -61,5 +57,4 @@ include "navbar.php";
 <?php else: ?>
     <div class="vacio">No tienes postulaciones asignadas.</div>
 <?php endif; ?>
-
 <?php include "footer.php"; ?>

@@ -3,7 +3,6 @@ require_once "guard.php";
 requerirRol('postulante');
 include "conexion.php";
 $__titulo = "Mis Postulaciones";
-
 $stmt = $conexion->prepare(
     "SELECT vp.*, fn_total_semanas(vp.P_Id) AS TotalSemanas
     FROM vista_postulaciones vp
@@ -13,15 +12,12 @@ $stmt = $conexion->prepare(
 $stmt->bind_param("ss", $__rut, $__rut);
 $stmt->execute();
 $postulaciones = $stmt->get_result();
-
 include "navbar.php";
 ?>
-
 <div class="seccion-header">
     <h2 class="titulo-seccion">Mis Postulaciones</h2>
     <a href="crear_postulacion.php" class="btn btn-primary">+ Nueva Postulación</a>
 </div>
-
 <?php if ($postulaciones->num_rows > 0): ?>
 <div class="tabla-wrapper">
     <table class="tabla">
@@ -47,7 +43,6 @@ include "navbar.php";
                 <td><span class="badge badge-<?= strtolower(str_replace(' ', '-', $row['Estado'])) ?>"><?= htmlspecialchars($row['Estado']) ?></span></td>
                 <td class="acciones">
                     <a href="ver_postulacion.php?id=<?= $row['P_Id'] ?>" class="btn btn-sm btn-info">Ver</a>
-
                     <?php if ($row['P_Estado_ID'] == 1): // Borrador — puede editar y enviar ?>
                         <a href="editar_postulacion.php?id=<?= $row['P_Id'] ?>" class="btn btn-sm btn-warning">Editar</a>
                         <a href="enviar_postulacion.php?id=<?= $row['P_Id'] ?>"
@@ -75,5 +70,4 @@ include "navbar.php";
         <br><a href="crear_postulacion.php" class="btn btn-primary" style="margin-top:1rem">Crear tu primera postulación</a>
     </div>
 <?php endif; ?>
-
 <?php include "footer.php"; ?>

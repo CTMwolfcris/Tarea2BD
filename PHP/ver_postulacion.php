@@ -5,32 +5,27 @@
 require_once "guard.php";
 include "conexion.php";
 $__titulo = "Detalle Postulación";
-
 $id = (int)($_GET['id'] ?? 0);
 if (!$id) {
     header("Location: index.php");
     exit();
 }
-
 // Obtener postulación desde la vista
 $stmt = $conexion->prepare("SELECT * FROM vista_postulaciones WHERE P_Id = ?");
 $stmt->bind_param("i", $id);
 $stmt->execute();
 $post = $stmt->get_result()->fetch_assoc();
-
 if (!$post) {
     $_SESSION['flash_error'] = "Postulación no encontrada.";
     header("Location: index.php");
     exit();
 }
-
 // Restricción: postulante solo ve las suyas
 if ($__rol === 'postulante' && $post['P_Responsable1_Rut'] !== $__rut && $post['P_Responsable2_Rut'] !== $__rut) {
     $_SESSION['flash_error'] = "No tienes permiso para ver esa postulación.";
     header("Location: index.php");
     exit();
 }
-
 // Equipo de trabajo
 $stmtEq = $conexion->prepare(
     "SELECT eq.EQ_Rol, eq.EQ_AreaEspecializacion, i.I_Nombre, i.I_Rut, i.I_Email, i.I_Telefono
@@ -41,7 +36,6 @@ $stmtEq = $conexion->prepare(
 $stmtEq->bind_param("i", $id);
 $stmtEq->execute();
 $equipo = $stmtEq->get_result();
-
 // Cronograma
 $stmtEt = $conexion->prepare(
     "SELECT ET_Nombre, ET_Semanas, ET_Entregable FROM etapa WHERE ET_Postulacion_ID = ? ORDER BY ET_Id"
@@ -49,13 +43,11 @@ $stmtEt = $conexion->prepare(
 $stmtEt->bind_param("i", $id);
 $stmtEt->execute();
 $etapas = $stmtEt->get_result();
-
-// Total semanas usando function SQL
+// llamamos la funcion que suma las semanas del cronograma
 $stmtSem = $conexion->prepare("SELECT fn_total_semanas(?) AS total");
 $stmtSem->bind_param("i", $id);
 $stmtSem->execute();
 $totalSem = $stmtSem->get_result()->fetch_assoc()['total'];
-
 // Historial de evaluaciones
 $stmtEv = $conexion->prepare(
     "SELECT ev.EV_Fecha, ev.EV_Comentario, ep.EP_Nombre AS estado, ev.EV_Evaluador_Rut
@@ -67,17 +59,14 @@ $stmtEv = $conexion->prepare(
 $stmtEv->bind_param("i", $id);
 $stmtEv->execute();
 $evaluaciones = $stmtEv->get_result();
-
 include "navbar.php";
 ?>
-
 <div class="seccion-header">
     <h2 class="titulo-seccion">
         <?= htmlspecialchars($post['P_Codigo_interno']) ?> — <?= htmlspecialchars($post['P_Nombre']) ?>
     </h2>
     <span class="badge badge-<?= strtolower(str_replace(' ', '-', $post['Estado'])) ?> badge-lg"><?= htmlspecialchars($post['Estado']) ?></span>
 </div>
-
 <!-- ANTECEDENTES POSTULACIÓN -->
 <div class="card">
     <h3 class="card-titulo">Antecedentes de Postulación</h3>
@@ -96,7 +85,6 @@ include "navbar.php";
         <div><label>Presupuesto Total</label><p><strong>$<?= number_format($post['P_Presupuesto'], 0, ',', '.') ?></strong></p></div>
     </div>
 </div>
-
 <!-- ANTECEDENTES EMPRESA -->
 <div class="card">
     <h3 class="card-titulo">Antecedentes Entidad Externa</h3>
@@ -107,7 +95,6 @@ include "navbar.php";
         <div><label>Convenio Marco USM</label><p><?= $post['ConvenioUSM'] ? 'Sí' : 'No' ?></p></div>
     </div>
 </div>
-
 <!-- ANTECEDENTES INICIATIVA -->
 <div class="card">
     <h3 class="card-titulo">Antecedentes de la Iniciativa</h3>
@@ -129,7 +116,6 @@ include "navbar.php";
         <?php endif; ?>
     </div>
 </div>
-
 <!-- EQUIPO DE TRABAJO -->
 <div class="card">
     <h3 class="card-titulo">Equipo de Trabajo</h3>
@@ -155,7 +141,6 @@ include "navbar.php";
         <p class="texto-muted">Sin integrantes registrados.</p>
     <?php endif; ?>
 </div>
-
 <!-- CRONOGRAMA -->
 <div class="card">
     <h3 class="card-titulo">Cronograma</h3>
@@ -179,7 +164,6 @@ include "navbar.php";
         <p class="texto-muted">Sin etapas registradas.</p>
     <?php endif; ?>
 </div>
-
 <!-- HISTORIAL EVALUACIONES -->
 <?php if ($evaluaciones->num_rows > 0): ?>
 <div class="card">
@@ -193,7 +177,6 @@ include "navbar.php";
     <?php endwhile; ?>
 </div>
 <?php endif; ?>
-
 <div class="acciones-bottom">
     <a href="javascript:history.back()" class="btn btn-secundario">← Volver</a>
     <?php if ($__rol === 'postulante' && in_array($post['P_Estado_ID'], [1, 2, 3])): ?>

@@ -12,50 +12,40 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CT-USM — <?= $__titulo ?? 'Sistema de Postulaciones' ?></title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="css/estilo.css">
 </head>
 <body>
-
 <nav class="navbar">
     <div class="nav-brand">
         <a href="index.php">CT-USM</a>
     </div>
-
-    <div class="nav-links">
-        <a href="index.php"         class="<?= basename($_SERVER['PHP_SELF']) === 'index.php'         ? 'activo' : '' ?>">Inicio</a>
-        <a href="buscar.php"        class="<?= basename($_SERVER['PHP_SELF']) === 'buscar.php'        ? 'activo' : '' ?>">Buscar</a>
-        <a href="busqueda_avanzada.php" class="<?= basename($_SERVER['PHP_SELF']) === 'busqueda_avanzada.php' ? 'activo' : '' ?>">Búsqueda Avanzada</a>
-
+    <div class="nav-links d-flex gap-2">
+        <a href="index.php" class="btn btn-outline-light btn-sm">Inicio</a>
+        <a href="buscar.php" class="btn btn-outline-light btn-sm">Buscar</a>
+        <a href="busqueda_avanzada.php" class="btn btn-outline-light btn-sm">Búsqueda Avanzada</a>
         <?php if ($__rol === 'postulante'): ?>
-            <a href="crear_postulacion.php" class="<?= basename($_SERVER['PHP_SELF']) === 'crear_postulacion.php' ? 'activo' : '' ?>">Nueva Postulación</a>
-            <a href="mis_postulaciones.php" class="<?= basename($_SERVER['PHP_SELF']) === 'mis_postulaciones.php' ? 'activo' : '' ?>">Mis Postulaciones</a>
+            <a href="crear_postulacion.php" class="btn btn-outline-light btn-sm">Nueva Postulación</a>
+            <a href="mis_postulaciones.php" class="btn btn-outline-light btn-sm">Mis Postulaciones</a>
         <?php endif; ?>
 
         <?php if ($__rol === 'coordinador'): ?>
-            <a href="mis_asignaciones.php" class="<?= basename($_SERVER['PHP_SELF']) === 'mis_asignaciones.php' ? 'activo' : '' ?>">Mis Asignaciones</a>
+            <a href="mis_asignaciones.php" class="btn btn-outline-light btn-sm">Mis Asignaciones</a>
         <?php endif; ?>
 
         <?php if ($__rol === 'administrador'): ?>
-            <a href="gestionar_usuarios.php"    class="<?= basename($_SERVER['PHP_SELF']) === 'gestionar_usuarios.php'    ? 'activo' : '' ?>">Usuarios</a>
-            <a href="gestionar_asignaciones.php" class="<?= basename($_SERVER['PHP_SELF']) === 'gestionar_asignaciones.php' ? 'activo' : '' ?>">Asignaciones</a>
+            <a href="gestionar_usuarios.php"    class="btn btn-outline-light btn-sm">Usuarios</a>
+            <a href="gestionar_asignaciones.php" class="btn btn-outline-light btn-sm">Asignaciones</a>
         <?php endif; ?>
     </div>
-
     <div class="nav-user">
-        <span class="nav-rol
-            <?= $__rol === 'postulante'    ? 'rol-postulante'    : '' ?>
-            <?= $__rol === 'coordinador'   ? 'rol-coordinador'   : '' ?>
-            <?= $__rol === 'administrador' ? 'rol-admin'         : '' ?>
-        ">
-            <?= ucfirst($__rol) ?>
-        </span>
+        <span class="nav-rol<?= $__rol === 'postulante'    ? 'rol-postulante'    : '' ?><?= $__rol === 'coordinador'   ? 'rol-coordinador'   : '' ?><?= $__rol === 'administrador' ? 'rol-admin'         : '' ?>"><?= ucfirst($__rol) ?></span>
         <span><?= htmlspecialchars($__nombre) ?></span>
-        <a href="logout.php" class="btn-logout">Salir</a>
+        <a href="logout.php" class="btn btn-danger btn-sm">Salir</a>
     </div>
 </nav>
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <div class="contenido">
-
 <?php
 // Mostrar flash messages si existen
 if (!empty($_SESSION['flash_ok'])) {

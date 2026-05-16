@@ -6,21 +6,17 @@ require_once "guard.php";
 requerirRol('postulante', 'coordinador');
 include "conexion.php";
 $__titulo = "Editar Postulación";
-
 $id = (int)($_GET['id'] ?? 0);
 if (!$id) { header("Location: index.php"); exit(); }
-
 // Cargar postulación actual
 $stmtLoad = $conexion->prepare("SELECT * FROM postulacion WHERE P_Id = ?");
 $stmtLoad->bind_param("i", $id);
 $stmtLoad->execute();
 $post = $stmtLoad->get_result()->fetch_assoc();
-
 if (!$post) {
     $_SESSION['flash_error'] = "Postulación no encontrada.";
     header("Location: index.php"); exit();
 }
-
 // Verificar permisos según rol
 if ($__rol === 'postulante') {
     if ($post['P_Responsable1_Rut'] !== $__rut && $post['P_Responsable2_Rut'] !== $__rut) {
@@ -32,9 +28,7 @@ if ($__rol === 'postulante') {
         header("Location: mis_postulaciones.php"); exit();
     }
 }
-
 $error = "";
-
 // Cargar datos equipo y etapas actuales
 $stmtEq = $conexion->prepare(
     "SELECT eq.EQ_Rut_Integrante, eq.EQ_AreaEspecializacion, eq.EQ_Rol
@@ -43,14 +37,12 @@ $stmtEq = $conexion->prepare(
 $stmtEq->bind_param("i", $id);
 $stmtEq->execute();
 $equipoActual = $stmtEq->get_result()->fetch_all(MYSQLI_ASSOC);
-
 $stmtEt = $conexion->prepare(
     "SELECT ET_Id, ET_Nombre, ET_Semanas, ET_Entregable FROM etapa WHERE ET_Postulacion_ID = ? ORDER BY ET_Id"
 );
 $stmtEt->bind_param("i", $id);
 $stmtEt->execute();
 $etapasActual = $stmtEt->get_result()->fetch_all(MYSQLI_ASSOC);
-
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $nombre      = trim($_POST['nombre']      ?? '');
     $presupuesto = (int)($_POST['presupuesto'] ?? 0);
@@ -66,15 +58,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $region_ej   = (int)($_POST['region_ej']  ?? 0);
     $region_imp  = (int)($_POST['region_imp'] ?? 0);
     $campus_id   = (int)($_POST['campus_id']  ?? 0);
-
     $eq_ruts  = $_POST['eq_rut']  ?? [];
     $eq_areas = $_POST['eq_area'] ?? [];
     $eq_roles = $_POST['eq_rol']  ?? [];
-
     $et_nombres     = $_POST['et_nombre']     ?? [];
     $et_semanas     = $_POST['et_semanas']    ?? [];
     $et_entregables = $_POST['et_entregable'] ?? [];
-
     if (!$nombre || !$presupuesto || !$descripcion || !$iniciativa
         || !$resp1 || !$resp2 || !$empresa_rut || !$region_ej || !$region_imp || !$campus_id) {
         $error = "Completa todos los campos obligatorios.";
@@ -95,15 +84,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $iniciativa, $resp1, $resp2,
             $empresa_rut, $region_ej, $region_imp, $campus_id, $id
         );
-
         if ($stmtUp->execute()) {
-            // Reemplazar equipo: borrar e insertar
+            // borramos el equipo anterior y metemos el nuevo
             $conexion->prepare("DELETE FROM equipotrabajo WHERE EQ_Id_Postulacion=?")->execute() ||
             $conexion->query("DELETE FROM equipotrabajo WHERE EQ_Id_Postulacion=$id");
-
             $delEq = $conexion->prepare("DELETE FROM equipotrabajo WHERE EQ_Id_Postulacion=?");
             $delEq->bind_param("i", $id); $delEq->execute();
-
             foreach ($eq_ruts as $idx => $rut) {
                 $rut  = trim($rut);
                 $area = trim($eq_areas[$idx] ?? '');
@@ -114,11 +100,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     $ins->execute();
                 }
             }
-
             // Reemplazar etapas
             $delEt = $conexion->prepare("DELETE FROM etapa WHERE ET_Postulacion_ID=?");
             $delEt->bind_param("i", $id); $delEt->execute();
-
             foreach ($et_nombres as $idx => $nombre_et) {
                 $nombre_et  = trim($nombre_et);
                 $semanas    = (int)($et_semanas[$idx] ?? 0);
@@ -129,15 +113,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     $ins->execute();
                 }
             }
-
             $_SESSION['flash_ok'] = "Postulación actualizada correctamente.";
             header("Location: ver_postulacion.php?id=$id"); exit();
         } else {
             $error = "Error al actualizar: " . $conexion->error;
         }
     }
-
-    // Si hay error, re-usar lo que vino del POST
+    // si fallo algo dejamos los datos que ya tenia el form
     $post['P_Nombre']       = $nombre;
     $post['P_Presupuesto']  = $presupuesto;
     $post['P_Descripcion']  = $descripcion;
@@ -145,25 +127,19 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $post['P_Solucion']     = $solucion;
     $post['P_Otros_Documentos'] = $otros_docs;
 }
-
 // Cargar listas para selects
 $regiones   = $conexion->query("SELECT R_ID, R_Nombre FROM region ORDER BY R_ID");
 $campus     = $conexion->query("SELECT C_Id, C_Nombre FROM campus ORDER BY C_Nombre");
 $tipos      = $conexion->query("SELECT TI_Id, TI_Tipo FROM tipoiniciativa");
 $empresas   = $conexion->query("SELECT E_Rut, E_Nombre FROM empresaexterna ORDER BY E_Nombre");
 $integrantesOpts = $conexion->query("SELECT I_Rut, I_Nombre FROM integrantes ORDER BY I_Nombre")->fetch_all(MYSQLI_ASSOC);
-
 include "navbar.php";
 ?>
-
 <h2 class="titulo-seccion">Editar Postulación — <?= htmlspecialchars($post['P_Codigo_interno']) ?></h2>
-
 <?php if ($error): ?>
     <div class="alerta alerta-error"><?= htmlspecialchars($error) ?></div>
 <?php endif; ?>
-
 <form method="POST" class="formulario-grande">
-
     <div class="card">
         <h3 class="card-titulo">Antecedentes de Postulación</h3>
         <div class="grid-2col">
@@ -232,7 +208,6 @@ include "navbar.php";
             </div>
         </div>
     </div>
-
     <div class="card">
         <h3 class="card-titulo">Entidad Externa</h3>
         <div class="campo">
@@ -246,7 +221,6 @@ include "navbar.php";
             </select>
         </div>
     </div>
-
     <div class="card">
         <h3 class="card-titulo">Iniciativa</h3>
         <div class="campo">
@@ -274,7 +248,6 @@ include "navbar.php";
             <input type="number" name="presupuesto" min="1" required value="<?= $post['P_Presupuesto'] ?>">
         </div>
     </div>
-
     <!-- EQUIPO -->
     <div class="card">
         <h3 class="card-titulo">Equipo de Trabajo</h3>
@@ -301,7 +274,6 @@ include "navbar.php";
         </table>
         <button type="button" class="btn btn-sm btn-secundario" onclick="agregarIntegrante()">+ Agregar</button>
     </div>
-
     <!-- ETAPAS -->
     <div class="card">
         <h3 class="card-titulo">Cronograma</h3>
@@ -320,13 +292,11 @@ include "navbar.php";
         </table>
         <button type="button" class="btn btn-sm btn-secundario" onclick="agregarEtapa()">+ Agregar</button>
     </div>
-
     <div class="acciones-bottom">
         <a href="ver_postulacion.php?id=<?= $id ?>" class="btn btn-secundario">Cancelar</a>
         <button type="submit" class="btn btn-primary">Guardar Cambios</button>
     </div>
 </form>
-
 <script>
 const opcionesIntegrantes = `<?php
 $opts = '';
@@ -336,7 +306,6 @@ foreach ($integrantesOpts as $i) {
 }
 echo addslashes($opts);
 ?>`;
-
 function agregarIntegrante() {
     const tbody = document.getElementById('filas-equipo');
     const tr = document.createElement('tr');
@@ -356,5 +325,4 @@ function agregarEtapa() {
     tbody.appendChild(tr);
 }
 </script>
-
 <?php include "footer.php"; ?>
