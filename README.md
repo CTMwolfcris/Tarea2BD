@@ -124,13 +124,10 @@ Activado desde `enviar_postulacion.php`.
 
 ## Supuestos asumidos
 
-1. El responsable 1 y 2 de una postulación deben ser personas diferentes.
-2. Los borradores solo pueden ser eliminados; las postulaciones enviadas o en revisión pueden ser editadas pero no eliminadas.
-3. Un postulante puede ver y editar postulaciones donde es responsable 1 o responsable 2.
-4. La contraseña de los usuarios de prueba insertados en la BD es `password` (hash bcrypt).
+1. La normalizacion de la base de datos se hizo en base al modelo logico obtenido en la tarea anterior
+2. El responsable 1 y 2 de una postulación deben ser personas diferentes.
+3. Los borradores solo pueden ser eliminados; las postulaciones enviadas o en revisión pueden ser editadas pero no eliminadas.
+4. Un postulante puede ver y editar postulaciones donde es responsable 1 o responsable 2.
 5. El campo `P_Fecha_Envio` se rellena automáticamente con el trigger al cambiar a estado "Enviada"; no se ingresa manualmente.
 6. La búsqueda rápida y búsqueda avanzada están disponibles para todos los roles; el postulante solo ve sus propias postulaciones en los resultados.
 7. El administrador puede asignar cualquier coordinador activo a cualquier postulación en estado Enviada o En Revisión.
-8. Al asignar un evaluador a una postulación "Enviada", se cambia automáticamente su estado a "En Revisión".
-9. ON DELETE CASCADE está habilitado en `equipotrabajo` y `etapa` respecto a `postulacion`, por lo que eliminar una postulación borra automáticamente su equipo y cronograma.
-10. La columna `EQ_EMAIL` y `EQ_Telefono` fueron movidas de `equipotrabajo` a `integrantes` (normalización 2FN): email y teléfono dependen del integrante, no de su participación en un proyecto.
