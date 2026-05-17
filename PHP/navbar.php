@@ -28,7 +28,6 @@
             <a href="crear_postulacion.php" class="btn btn-outline-light btn-sm">Nueva Postulación</a>
             <a href="mis_postulaciones.php" class="btn btn-outline-light btn-sm">Mis Postulaciones</a>
         <?php endif; ?>
-
         <?php if ($__rol === 'coordinador'): ?>
             <a href="mis_asignaciones.php" class="btn btn-outline-light btn-sm">Mis Asignaciones</a>
         <?php endif; ?>
@@ -39,8 +38,7 @@
         <?php endif; ?>
     </div>
     <div class="nav-user">
-        <span class="nav-rol<?= $__rol === 'postulante'    ? 'rol-postulante'    : '' ?><?= $__rol === 'coordinador'   ? 'rol-coordinador'   : '' ?><?= $__rol === 'administrador' ? 'rol-admin'         : '' ?>"><?= ucfirst($__rol) ?></span>
-        <span><?= htmlspecialchars($__nombre) ?></span>
+        <span class="nav-rol <?= $__rol === 'postulante' ? 'rol-postulante' : ($__rol === 'coordinador' ? 'rol-coordinador' : 'rol-admin') ?>">
         <a href="logout.php" class="btn btn-danger btn-sm">Salir</a>
     </div>
 </nav>

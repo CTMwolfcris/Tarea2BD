@@ -78,7 +78,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             P_Empresa_Rut=?, P_Region_Realizar=?, P_Region_Impacto=?, P_ID_Campus=?
             WHERE P_Id=?"
         );
-        $stmtUp->bind_param("sisssssissssiiiii",
+            $stmtUp->bind_param("sisssssississiii",
             $nombre, $presupuesto, $descripcion, $objetivo,
             $solucion, $resultados, $otros_docs,
             $iniciativa, $resp1, $resp2,
@@ -86,8 +86,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         );
         if ($stmtUp->execute()) {
             // borramos el equipo anterior y metemos el nuevo
-            $conexion->prepare("DELETE FROM equipotrabajo WHERE EQ_Id_Postulacion=?")->execute() ||
-            $conexion->query("DELETE FROM equipotrabajo WHERE EQ_Id_Postulacion=$id");
             $delEq = $conexion->prepare("DELETE FROM equipotrabajo WHERE EQ_Id_Postulacion=?");
             $delEq->bind_param("i", $id); $delEq->execute();
             foreach ($eq_ruts as $idx => $rut) {

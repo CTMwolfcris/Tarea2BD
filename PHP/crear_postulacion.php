@@ -60,7 +60,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 P_Empresa_Rut, P_Region_Realizar, P_Region_Impacto, P_Estado_ID, P_ID_Campus)
                 VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,1,?)"
             );
-            $stmt->bind_param("ssisdssssissiiii",
+                $stmt->bind_param("ssissssssissiiii",
                 $codigo, $nombre, $presupuesto, $fecha, $descripcion,
                 $objetivo, $solucion, $resultados, $otros_docs,
                 $iniciativa, $resp1, $resp2,

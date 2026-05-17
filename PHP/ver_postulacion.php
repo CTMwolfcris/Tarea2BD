@@ -43,7 +43,7 @@ $stmtEt = $conexion->prepare(
 $stmtEt->bind_param("i", $id);
 $stmtEt->execute();
 $etapas = $stmtEt->get_result();
-// llamamos la funcion que suma las semanas del cronograma
+// Total semanas usando function SQL
 $stmtSem = $conexion->prepare("SELECT fn_total_semanas(?) AS total");
 $stmtSem->bind_param("i", $id);
 $stmtSem->execute();

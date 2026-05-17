@@ -18,9 +18,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'asign
         );
         $ins->bind_param("is", $postulacion_id, $evaluador_rut);
         if ($ins->execute()) {
-            // Cambiar estado a "En Revision" si estaba en "Enviada"
-            $conexion->prepare("UPDATE postulacion SET P_Estado_ID=3 WHERE P_Id=? AND P_Estado_ID=2")
-                ->execute() || null;
             $upd = $conexion->prepare("UPDATE postulacion SET P_Estado_ID=3 WHERE P_Id=? AND P_Estado_ID=2");
             $upd->bind_param("i", $postulacion_id);
             $upd->execute();
