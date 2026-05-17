@@ -101,15 +101,17 @@ include "navbar.php";
     <div>
         <label>Nombre Iniciativa</label><p><?= htmlspecialchars($post['P_Nombre']) ?></p>
         <label>Objetivo / Descripción del problema</label>
-        <p><?= nl2br(htmlspecialchars($post['P_Descripcion'])) ?></p>
+        <p><?= nl2br(htmlspecialchars($post['P_Descripcion'] ?? '')) ?></p>
         <?php if ($post['P_Objetivo'] ?? null): ?>
         <label>Descripción posibles soluciones</label>
-        <p><?= nl2br(htmlspecialchars($post['P_Objetivo'])) ?></p>
+        <p><?= nl2br(htmlspecialchars($post['P_Objetivo'] ?? '')) ?></p>
         <?php endif; ?>
         <?php if ($post['P_Solucion'] ?? null): ?>
         <label>Resultados Esperados</label>
+        <p><?= nl2br(htmlspecialchars($post['P_Solucion'] ?? '')) ?></p>
         <p><?= nl2br(htmlspecialchars($post['P_Solucion'])) ?></p>
         <?php endif; ?>
+        <p><?= nl2br(htmlspecialchars($post['P_Otros_Documentos'] ?? '')) ?></p>
         <?php if ($post['P_Otros_Documentos'] ?? null): ?>
         <label>Otros Documentos</label>
         <p><?= htmlspecialchars($post['P_Otros_Documentos']) ?></p>
