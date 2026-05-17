@@ -142,7 +142,7 @@ include "navbar.php";
                 <td>$<?= number_format($row['P_Presupuesto'], 0, ',', '.') ?></td>
                 <td><span class="badge badge-<?= strtolower(str_replace(' ', '-', $row['Estado'])) ?>"><?= htmlspecialchars($row['Estado']) ?></span></td>
                 <td>
-                    <a href="ver_postulacion.php?id=<?= $row['P_Id'] ?>" class="btn btn-outline-light btn-sm>Ver</a>
+                    <a href="ver_postulacion.php?id=<?= $row['P_Id'] ?>" class="btn btn-outline-light btn-sm">Ver</a>
                     <?php if ($__rol === 'coordinador' && in_array($row['P_Estado_ID'], [2,3])): ?>
                         <a href="evaluar_postulacion.php?id=<?= $row['P_Id'] ?>" class="btn btn-sm btn-primary">Evaluar</a>
                     <?php endif; ?>
