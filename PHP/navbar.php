@@ -38,7 +38,7 @@
         <?php endif; ?>
     </div>
     <div class="nav-user">
-        <span class="nav-rol <?= $__rol === 'postulante' ? 'rol-postulante' : ($__rol === 'coordinador' ? 'rol-coordinador' : 'rol-admin') ?>">
+        <span class="nav-rol <?= $__rol === 'postulante' ? 'rol-postulante' : ($__rol === 'coordinador' ? 'rol-coordinador' : 'rol-admin') ?>"></span>
         <a href="logout.php" class="btn btn-danger btn-sm">Salir</a>
     </div>
 </nav>
